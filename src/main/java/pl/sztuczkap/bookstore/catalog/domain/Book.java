@@ -1,4 +1,4 @@
-package pl.sztuczkap.bookstore;
+package pl.sztuczkap.bookstore.catalog.domain;
 
 import java.util.StringJoiner;
 
