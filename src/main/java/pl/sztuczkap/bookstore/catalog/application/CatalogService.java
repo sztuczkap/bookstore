@@ -1,5 +1,6 @@
 package pl.sztuczkap.bookstore.catalog.application;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.sztuczkap.bookstore.catalog.application.port.CatalogUseCase;
@@ -11,13 +12,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 class CatalogService implements CatalogUseCase {
 
     private final CatalogRepository repository;
-
-    public CatalogService(@Qualifier("schoolCatalogRepository") CatalogRepository repository) {
-        this.repository = repository;
-    }
 
     @Override
     public List<Book> findByTitle(String title) {
@@ -38,8 +36,9 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    public void addBook() {
-
+    public void addBook(CreateBookCommand command) {
+        Book book = new Book(command.getTitle(), command.getAuthor(), command.getYear());
+        repository.save(book);
     }
 
     @Override
