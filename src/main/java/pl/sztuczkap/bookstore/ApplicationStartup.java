@@ -9,28 +9,30 @@ import pl.sztuczkap.bookstore.catalog.domain.Book;
 
 import java.util.List;
 
+import static pl.sztuczkap.bookstore.catalog.application.port.CatalogUseCase.*;
+
 @Component
 public class ApplicationStartup implements CommandLineRunner {
 
     private final CatalogUseCase catalog;
     private final String title;
-    private final Long limit;
 
     public ApplicationStartup(
             CatalogUseCase catalog,
-            @Value("${bookstore.catalog.query}") String title,
-            @Value("${bookstore.catalog.limit}") Long limit
+            @Value("${bookstore.catalog.query}") String title
     ) {
         this.catalog = catalog;
         this.title = title;
-        this.limit = limit;
     }
 
     @Override
     public void run(String... args) {
         initData();
         findByTitle();
+        findAndUpdate();
+        findByTitle();
     }
+
 
     private void initData() {
         catalog.addBook(new CreateBookCommand("Pan Tadeusz", "Adam Mickiewicz", 1834));
@@ -41,6 +43,21 @@ public class ApplicationStartup implements CommandLineRunner {
 
     private void findByTitle() {
         List<Book> books = catalog.findByTitle(title);
-        books.stream().limit(limit).forEach(System.out::println);
+        books.forEach(System.out::println);
     }
+
+    private void findAndUpdate() {
+        System.out.println("Updating book...");
+        catalog.findOneByTitleAndAutor("Pan Tadeusz", "Adam Mickiewicz")
+                .ifPresent(book -> {
+                    UpdateBookCommand command = UpdateBookCommand
+                            .builder()
+                            .id(book.getId())
+                            .title("Pan Tadeusz, czyli Ostatni Zajazd na Litwie")
+                            .build();
+                    UpdateBookResponse response = catalog.updateBook(command);
+                    System.out.println("Updating book result: " + response.isSuccess());
+                });
+    }
+
 }
