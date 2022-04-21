@@ -1,5 +1,8 @@
 package pl.sztuczkap.bookstore.order.domain;
 
+import lombok.Value;
+
+@Value
 public class Recipient {
     String name;
     String phone;
