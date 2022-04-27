@@ -1,7 +1,6 @@
 package pl.sztuczkap.bookstore.catalog.application;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.sztuczkap.bookstore.catalog.application.port.CatalogUseCase;
 import pl.sztuczkap.bookstore.catalog.domain.Book;
@@ -19,6 +18,11 @@ class CatalogService implements CatalogUseCase {
     private final CatalogRepository repository;
 
     @Override
+    public List<Book> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
     public List<Book> findByTitle(String title) {
         return repository.findAll()
                 .stream()
@@ -27,9 +31,13 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    public List<Book> findAll() {
-        return repository.findAll();
+    public Optional<Book> findOneByTitle(String title) {
+        return repository.findAll()
+                .stream()
+                .filter(book -> book.getTitle().startsWith(title))
+                .findFirst();
     }
+
 
     @Override
     public Optional<Book> findOneByTitleAndAutor(String title, String author) {
@@ -42,7 +50,7 @@ class CatalogService implements CatalogUseCase {
 
     @Override
     public void addBook(CreateBookCommand command) {
-        Book book = new Book(command.getTitle(), command.getAuthor(), command.getYear());
+        Book book = command.toBook();
         repository.save(book);
     }
 
@@ -50,7 +58,7 @@ class CatalogService implements CatalogUseCase {
     public UpdateBookResponse updateBook(UpdateBookCommand command) {
         return repository.findById(command.getId())
                 .map(book -> {
-                    Book updatedBook =  command.updateFields(book);
+                    Book updatedBook = command.updateFields(book);
                     repository.save(updatedBook);
                     return UpdateBookResponse.SUCCESS;
                 })

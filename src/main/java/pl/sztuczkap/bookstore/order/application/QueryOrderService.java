@@ -15,6 +15,6 @@ public class QueryOrderService implements QueryOrderUSeCase {
 
     @Override
     public List<Order> findAll() {
-        return null;
+        return repository.findAll();
     }
 }
