@@ -24,7 +24,7 @@ public interface CatalogUseCase {
 
     Optional<Book> findOneByTitleAndAutor(String title, String author);
 
-    void addBook(CreateBookCommand command);
+    Book addBook(CreateBookCommand command);
 
     UpdateBookResponse updateBook(UpdateBookCommand command);
 
