@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pl.sztuczkap.bookstore.catalog.application.port.CatalogUseCase;
 import pl.sztuczkap.bookstore.catalog.domain.Book;
@@ -15,8 +17,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static pl.sztuczkap.bookstore.catalog.application.port.CatalogUseCase.*;
 
@@ -44,6 +46,9 @@ public class CatalogController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
+        if (id.equals(42L)) {
+            throw new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "I am a teapot. Sorry");
+        }
         return catalog
                 .findById(id)
                 .map(ResponseEntity::ok)
@@ -70,15 +75,15 @@ public class CatalogController {
 
     @Data
     private static class RestCreateBookCommand {
-        @NotBlank
+        @NotBlank(message = "Please provide a title")
         private String title;
 
-        @NotBlank
+        @NotBlank(message = "Please provide a author")
         private String author;
 
         @NotNull
         private Integer year;
-        
+
         @NotNull
         @DecimalMin("0.00")
         private BigDecimal price;
